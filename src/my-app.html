@@ -38,35 +38,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
-
       app-header {
         color: #fff;
         background-color: var(--app-primary-color);
       }
 
-      app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
-      }
-
-      .drawer-list {
-        margin: 0 20px;
-      }
-
-      .drawer-list a {
-        display: block;
-        padding: 0 16px;
-        text-decoration: none;
-        color: var(--app-secondary-color);
-        line-height: 40px;
-      }
-
-      .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
-      }
     </style>
 
     <app-location
@@ -82,11 +58,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-route>
 
     <app-header slot="header" condenses reveals effects="waterfall">
-        <paper-tabs selected={{page}} attr-for-selected="name">
-          <paper-tab name="home">Home</paper-tab>
-          <paper-tab name="mouse">Mouse</paper-tab>
-          <paper-tab name="keyboard">Keyboard</paper-tab>
-        </paper-tabs>
+      <paper-tabs selected={{page}} attr-for-selected="name">
+        <paper-tab name="home">Home</paper-tab>
+        <paper-tab name="mouse">Mouse</paper-tab>
+        <paper-tab name="keyboard">Keyboard</paper-tab>
+      </paper-tabs>
     </app-header>
 
     <iron-pages

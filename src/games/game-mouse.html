@@ -23,6 +23,11 @@
         margin: auto;
       }
 
+      #container {
+        width: 100%;
+        height: 100vh;
+      }
+
     </style>
 
     <div class="card game-settings" hidden$="[[gameStarted]]">
@@ -32,7 +37,7 @@
       <paper-button class="button" on-click="start">start</paper-button>
     </div>
 
-
+    <div id="container"></div>
   </template>
   <script>
 
@@ -58,10 +63,27 @@
 
       start() {
         this.gameStarted = true;
-        setTimeout(() => {
 
-        }, this.settings.time);
+        let container = d3.select(this.$.container);
+        let width = container.node().offsetWidth;
+        let height = container.node().offsetHeight;
+
+        let svg = container.append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                  .append("g");
+
+
+
       }
+
+      _generatePoint() {
+        let point = {};
+            point.x = d3.randomUniform(-50,50)();
+            point.y = d3.randomUniform(-50,50)();
+        return point;
+      }
+
     }
     window.customElements.define(GameMouse.is, GameMouse);
   </script>
