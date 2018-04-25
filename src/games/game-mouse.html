@@ -25,7 +25,7 @@
 
     </style>
 
-    <div class="card game-settings">
+    <div class="card game-settings" hidden$="[[gameStarted]]">
       <h1>Mouse Accuracy</h1>
       <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
       <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculi.</p>
@@ -42,7 +42,12 @@
         return {
           gameStarted: {
             type: Boolean,
-            value: false
+            value: false,
+            notify: true
+          },
+          setting: {
+            type: Object,
+            notify: true
           }
         }
       }
@@ -51,12 +56,11 @@
         super.ready()
       }
 
-      constructor() {
-        super();
-      }
-
       start() {
+        this.gameStarted = true;
+        setTimeout(() => {
 
+        }, this.settings.time);
       }
     }
     window.customElements.define(GameMouse.is, GameMouse);
