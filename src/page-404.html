@@ -15,12 +15,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style>
       :host {
         display: block;
+      }
 
-        padding: 10px 20px;
+      .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
     </style>
 
-    Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+    <div class="content"><p>Oops! You hit a 404</p><a href="[[rootPath]]">Head back to home.</a></div>
   </template>
 
   <script>
