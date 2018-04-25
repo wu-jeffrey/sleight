@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+
+<dom-module id="game-mouse">
+  <template>
+      <style include="shared-styles">
+      :host {
+
+      }
+
+      .game-settings {
+        position: absolute;
+        height: 50%;
+        width: 50%;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+
+    </style>
+
+    <div class="card game-settings">
+      <h1>Mouse Accuracy</h1>
+      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
+      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculi.</p>
+    </div>
+
+
+  </template>
+  <script>
+
+    class GameMouse extends Polymer.Element {
+      static get is() { return "game-mouse"; }
+      static get properties() {
+        return {
+          gameStarted: {
+            type: Boolean,
+            value: false
+          }
+        }
+      }
+
+      ready() {
+        super.ready()
+      }
+
+      constructor() {
+        super();
+      }
+
+      start() {
+
+      }
+    }
+    window.customElements.define(GameMouse.is, GameMouse);
+  </script>
+</dom-module>
