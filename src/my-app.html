@@ -23,7 +23,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="my-icons.html">
 
-<link rel="lazy-import" href="page-home.html">
 <link rel="lazy-import" href="page-mouse.html">
 <link rel="lazy-import" href="page-keyboard.html">
 <link rel="lazy-import" href="page-404.html">
@@ -59,7 +58,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <app-header slot="header" condenses reveals effects="waterfall">
       <paper-tabs selected={{page}} attr-for-selected="name">
-        <paper-tab name="home">Home</paper-tab>
         <paper-tab name="mouse">Mouse</paper-tab>
         <paper-tab name="keyboard">Keyboard</paper-tab>
       </paper-tabs>
@@ -70,7 +68,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         attr-for-selected="name"
         fallback-selection="404"
         role="main">
-      <page-home name="home"></page-home>
       <page-mouse name="mouse"></page-mouse>
       <page-keyboard name="keyboard"></page-keyboard>
       <page-404 name="404"></page-404>
@@ -109,8 +106,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _routePageChanged(page) {
         // If no page was found in the route data, page will be an empty string.
-        // Default to 'home' in that case.
-        this.page = page || 'home';
+        // Default to 'mouse' in that case.
+        this.page = page || 'mouse';
       }
 
       _pageChanged(page) {
