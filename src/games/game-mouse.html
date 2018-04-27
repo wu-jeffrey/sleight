@@ -94,15 +94,15 @@
       </div>
       <div class="difficulty-section">
         <div class="difficulty-button">
-          <paper-icon-button icon="device:gps-off" name="noob" on-click="onRadioButtonClicked"></paper-icon-button>
+          <paper-icon-button icon="device:gps-off" id="noob" on-click="onDifficultyClicked"></paper-icon-button>
           <span>Noob</span>
         </div>
         <div class="difficulty-button">
-          <paper-icon-button icon="device:gps-not-fixed" name="average" on-click="onRadioButtonClicked"></paper-icon-button>
+          <paper-icon-button icon="device:gps-not-fixed" id="average" on-click="onDifficultyClicked"></paper-icon-button>
           <span>Average</span>
         </div>
         <div class="difficulty-button">
-          <paper-icon-button icon="device:gps-fixed" name="pro" on-click="onRadioButtonClicked"></paper-icon-button>
+          <paper-icon-button icon="device:gps-fixed" id="pro" on-click="onDifficultyClicked"></paper-icon-button>
           <span>Pro</span>
         </div>
       </div>
@@ -115,24 +115,24 @@
             <paper-input min="20" max="300" no-label-float type="number" value="{{time}}"></paper-input></div>
           </div>
         <div class="input">
-          <span>Spawn frequency (s)</span>
+          <span>Spawn frequency (ms)</span>
           <div>
-            <paper-slider min="0" max="5" pin value="{{frequency}}"></paper-slider>
-            <paper-input min="0" max="5" no-label-float type="number" value="{{frequency}}"></paper-input>
+            <paper-slider min="10" max="5000" pin value="{{frequency}}"></paper-slider>
+            <paper-input min="10" max="5000" no-label-float type="number" value="{{frequency}}"></paper-input>
           </div>
         </div>
         <div class="input">
-          <span>Target lifespan (s)</span>
+          <span>Target lifespan (ms)</span>
           <div>
-            <paper-slider min="0" max="10" pin value="{{lifeSpan}}"></paper-slider>
-            <paper-input min="0" max="10" no-label-float type="number" value="{{lifeSpan}}"></paper-input>
+            <paper-slider min="10" max="5000" pin value="{{lifeSpan}}"></paper-slider>
+            <paper-input min="10" max="5000" no-label-float type="number" value="{{lifeSpan}}"></paper-input>
           </div>
         </div>
         <div class="input">
           <span>Target radius (px)</span>
           <div>
-            <paper-slider min="0" max="25" pin value="{{circleRadius}}"></paper-slider>
-            <paper-input min="0" max="25" no-label-float type="number" value="{{circleRadius}}"></paper-input>
+            <paper-slider min="1" max="25" pin value="{{circleRadius}}"></paper-slider>
+            <paper-input min="1" max="25" no-label-float type="number" value="{{circleRadius}}"></paper-input>
           </div>
         </div>
       </div>
@@ -152,10 +152,10 @@
             value: false,
             notify: true
           },
-          time: { type: Number, value: 20, notify: true },
-          frequency: { type: Number, value: 1, notify: true },
-          lifeSpan: { type: Number, value: 1, notify: true },
-          circleRadius: { type: Number, value: 5, notify: true }
+          time: { type: Number, value: 60, notify: true },
+          frequency: { type: Number, value: 1000, notify: true },
+          lifeSpan: { type: Number, value: 1000, notify: true },
+          circleRadius: { type: Number, value: 8, notify: true }
         }
       }
 
@@ -163,16 +163,33 @@
         super.ready()
       }
 
+      onDifficultyClicked(event) {
+        let difficulty = event.target.id;
+        event.stopPropagation();
+        if (difficulty == "noob") {
+          this.set("frequency", 5000);
+          this.set("lifeSpan", 5000);
+          this.set("circleRadius", 25);
+        } else if (difficulty == "average") {
+          this.set("frequency", 1000);
+          this.set("lifeSpan", 1500);
+          this.set("circleRadius", 14);
+        } else if (difficulty == "pro") {
+          this.set("frequency", 300);
+          this.set("lifeSpan", 1000);
+          this.set("circleRadius", 5);
+        }
+      }
+
       start() {
         this.gameInProgress = true;
 
         let time           = this.time*1000;
-        let frequency      = this.frequency*1000;
-        let lifeSpan       = this.lifeSpan*1000;
-        let circleRadius     = this.circleRadius;
+        let frequency      = this.frequency;
+        let lifeSpan       = this.lifeSpan;
+        let circleRadius   = this.circleRadius;
 
         let pointIncrement = 100;
-        let domain         = pointIncrement - this.circleRadius;
 
         let container = d3.select(this.$.container);
         let margin = { top: 10, left: 10, bottom: 10, right: 10 };
@@ -186,21 +203,19 @@
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-        let xScale = d3.scaleLinear().range([0, width])
-                                     .domain([-domain, domain]);
-        this.xScale = xScale;
-        let yScale = d3.scaleLinear().range([height, 0])
-                                     .domain([-domain, domain]);
-        this.yScale = yScale;
+        let xScale = d3.scaleLinear().range([0, width - circleRadius*2])
+                                     .domain([-pointIncrement, pointIncrement]);
+        let yScale = d3.scaleLinear().range([height - circleRadius*2, 0])
+                                     .domain([-pointIncrement, pointIncrement]);
 
         let interval = setInterval(function() {
-          let x = d3.randomUniform(-domain, domain)();
-          let y = d3.randomUniform(-domain, domain)();
+          let x = d3.randomUniform(-pointIncrement, pointIncrement)();
+          let y = d3.randomUniform(-pointIncrement, pointIncrement)();
 
           let circle = svg.append("circle")
               .attr("r", this.circleRadius)
-              .attr("cx", this.xScale(x))
-              .attr("cy", this.yScale(y));
+              .attr("cx", xScale(x))
+              .attr("cy", yScale(y));
 
           setTimeout(() => {
             circle.remove();
