@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-icons/device-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
@@ -85,6 +86,11 @@
         cursor: crosshair;
       }
 
+      #score {
+        width: 50%;
+        height: 50%;
+      }
+
 
     </style>
 
@@ -112,8 +118,8 @@
         <div class="input">
           <span>Time (s)</span>
           <div>
-            <paper-slider min="20" max="300" pin value="{{time}}"></paper-slider>
-            <paper-input min="20" max="300" no-label-float type="number" value="{{time}}"></paper-input></div>
+            <paper-slider min="10" max="300" pin value="{{time}}"></paper-slider>
+            <paper-input min="10" max="300" no-label-float type="number" value="{{time}}"></paper-input></div>
           </div>
         <div class="input">
           <span>Spawn frequency (ms)</span>
@@ -140,6 +146,13 @@
       <paper-button class="button" on-click="start">start</paper-button>
     </div>
 
+
+    <paper-dialog id="score" with-backdrop>
+      <h1>Score</h1>
+      <p>Total Targets: {{totalTargets}}</p>
+      <p>Hits: {{totalTargets}}</p>
+      <p>Missclicks: {{totalTargets}}</p>
+    </paper-dialog>
     <div id="container"></div>
   </template>
   <script>
@@ -156,7 +169,10 @@
           time: { type: Number, value: 60, notify: true },
           frequency: { type: Number, value: 1000, notify: true },
           lifeSpan: { type: Number, value: 1000, notify: true },
-          circleRadius: { type: Number, value: 8, notify: true }
+          circleRadius: { type: Number, value: 8, notify: true },
+          totalTargets: { type: Number, value: 0, notify: true },
+          hits: { type: Number, value: 0, notify: true },
+          missClicks: { type: Number, value: 0, notify: true },
         }
       }
 
@@ -168,8 +184,8 @@
         let difficulty = event.target.id;
         event.stopPropagation();
         if (difficulty == "noob") {
-          this.set("frequency", 5000);
-          this.set("lifeSpan", 5000);
+          this.set("frequency", 2500);
+          this.set("lifeSpan", 2500);
           this.set("circleRadius", 25);
         } else if (difficulty == "average") {
           this.set("frequency", 1000);
@@ -185,12 +201,18 @@
       start() {
         this.gameInProgress = true;
 
-        let time           = this.time*1000;
+        // Reset Score
+        this.totalTargets  = 0;
+        this.hits          = 0;
+        this.misses        = 0;
+
+        // Translate custom-el's props to vars
+        let time           = this.time*1000; // s -> ms
         let frequency      = this.frequency;
         let lifeSpan       = this.lifeSpan;
         let circleRadius   = this.circleRadius;
 
-        let pointIncrement = 100;
+        let pointIncrement = 100; // Specifies the granularity/increments of coordinate axes
 
         let container = d3.select(this.$.container);
         let margin = { top: 10, left: 10, bottom: 10, right: 10 };
@@ -201,25 +223,34 @@
         let svg = container.append("svg")
                     .attr("width", width)
                     .attr("height", height)
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .on("click", () => {
+                      this.missClicks++;
+                    });
 
 
-        let xScale = d3.scaleLinear().range([0, width - circleRadius*2])
+        let xScale = d3.scaleLinear().range([0, width - circleRadius*2]) // - circleRadius*2 to avoid center of circle going outside of svg, cutting half of it out
                                      .domain([-pointIncrement, pointIncrement]);
         let yScale = d3.scaleLinear().range([height - circleRadius*2, 0])
                                      .domain([-pointIncrement, pointIncrement]);
 
         let interval = setInterval(function() {
+          this.totalTargets++;
           let x = d3.randomUniform(-pointIncrement, pointIncrement)();
           let y = d3.randomUniform(-pointIncrement, pointIncrement)();
 
-          let circle = svg.append("circle")
-              .attr("r", this.circleRadius)
+          let target = svg.append("circle")
+              .attr("r", circleRadius)
               .attr("cx", xScale(x))
-              .attr("cy", yScale(y));
+              .attr("cy", yScale(y))
+              .on("click", () => {
+                d3.event.stopPropagation();
+                target.remove();
+                this.hits++;
+              });
 
           setTimeout(() => {
-            circle.remove();
+            target.remove();
           }, lifeSpan);
         }.bind(this), frequency);
 
@@ -227,6 +258,7 @@
           clearInterval(interval);
           container.select("svg").remove();
           this.gameInProgress = false;
+          this.$.score.open();
         }, time);
       }
     }
