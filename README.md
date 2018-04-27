@@ -1,8 +1,8 @@
 # Sleight of Hand - Gaming warmup
 
-Three warmup games for mouse accuracy, typing speed and reaction time
+A simple practice and warmup utility to help gamers increase their mouse and keyboard speed, accuracy and precision.
 
-* **Mouse** components required for the initial route
-* **Keyboard** initial route ASAP
-* **Combine** components for remaining routes
-* **Reaction** and progressively upgrade next routes on-demand
+Built using Polymer 2.0 and D3.js
+
+* **Mouse** Click the targets! Adjust game length, spawn frequency, target life, target size and cursor.
+* **Keyboard** Press the right Keys!
