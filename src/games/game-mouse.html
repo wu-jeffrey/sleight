@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-range-slider/paper-range-slider.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-icons/device-icons.html">
@@ -29,6 +30,7 @@
 
       .game-settings {
         position: absolute;
+        min-width: 700px;
         width: 50%;
         height: 50%;
         top: 0;
@@ -76,19 +78,62 @@
         align-items: center;
       }
 
-      .input paper-input {
-        width: 50px;
+      paper-input {
+        width: 75px !important;
+      }
+
+      .text-input {
+        width: 210px;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .text-input p {
+        width: 20px;
+        margin: 0 15px;
+      }
+
+
+      paper-slider {
+        --paper-slider-container-color: var(--app-primary-color);
+        --paper-slider-active-color: var(--app-secondary-color);
+        --paper-slider-knob-color: var(--app-secondary-color);
+        --paper-slider-pin-color: var(--app-secondary-color);
+        --paper-slider-knob-start-color: var(--app-secondary-color);
+        --paper-slider-knob-start-border-color: var(--app-primary-color);
+      }
+
+      paper-range-slider {
+        --paper-range-slider-knob-color: var(--app-secondary-color);
+        --paper-range-slider-pin-color:var(--app-secondary-color);
+        --paper-range-slider-higher-color: var(--app-primary-color);
+        --paper-range-slider-lower-color: var(--app-primary-color);
+        --paper-range-slider-active-color: var(--app-secondary-color);
+        --paper-range-slider-knob-start-color: var(--app-secondary-color);
+        --paper-range-slider-knob-start-border-color: var(--app-primary-color);
       }
 
       #container {
         width: 100%;
         height: calc(100vh - 48px);
         cursor: crosshair;
+        overflow: hidden;
       }
 
       #score {
         width: 50%;
         height: 50%;
+      }
+
+      @keyframes pop {
+        from { stroke-dashoffset: 0; }
+        to   { stroke-dashoffset: -7; }
+      }
+
+      #clickAnimation0, #clickAnimation1 {
+        position: absolute;
+        stroke-dasharray: 8;
+        animation: pop 0.25s linear forwards;
       }
 
 
@@ -116,46 +161,102 @@
 
       <div id="input-section">
         <div class="input">
-          <span>Time (s)</span>
+          <span>Time</span>
           <div>
             <paper-slider min="10" max="300" pin value="{{time}}"></paper-slider>
-            <paper-input min="10" max="300" no-label-float type="number" value="{{time}}"></paper-input></div>
-          </div>
-        <div class="input">
-          <span>Spawn frequency (ms)</span>
-          <div>
-            <paper-slider min="10" max="5000" pin value="{{frequency}}"></paper-slider>
-            <paper-input min="10" max="5000" no-label-float type="number" value="{{frequency}}"></paper-input>
+            <div class="text-input">
+              <paper-input min="10" max="300" no-label-float type="number" value="{{time}}"><div slot="suffix">s</div></paper-input>
+            </div>
           </div>
         </div>
         <div class="input">
-          <span>Target lifespan (ms)</span>
+          <span>Spawn speed (ms)</span>
           <div>
-            <paper-slider min="10" max="5000" pin value="{{lifeSpan}}"></paper-slider>
-            <paper-input min="10" max="5000" no-label-float type="number" value="{{lifeSpan}}"></paper-input>
+            <paper-range-slider min="500" max="5000" pin value-min="{{frequency.min}}" value-max="{{frequency.max}}"></paper-range-slider>
+            <div class="text-input">
+              <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.min}}"><div slot="suffix">ms</div></paper-input>
+              <p>to</p>
+              <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.max}}"><div slot="suffix">ms</div></paper-input>
+            </div>
           </div>
         </div>
         <div class="input">
-          <span>Target radius (px)</span>
+          <span>Target lifespan</span>
+          <div>
+            <paper-slider min="500" max="5000" pin value="{{lifeSpan}}"></paper-slider>
+            <div class="text-input">
+              <paper-input min="500" max="5000" no-label-float type="number" value="{{lifeSpan}}"><div slot="suffix">ms</div></paper-input>
+            </div>
+          </div>
+        </div>
+        <div class="input">
+          <span>Target radius</span>
           <div>
             <paper-slider min="1" max="25" pin value="{{circleRadius}}"></paper-slider>
-            <paper-input min="1" max="25" no-label-float type="number" value="{{circleRadius}}"></paper-input>
+            <div class="text-input">
+              <paper-input min="1" max="25" no-label-float type="number" value="{{circleRadius}}"><div slot="suffix">px</div></paper-input>
+            </div>
           </div>
         </div>
       </div>
       <paper-button class="button" on-click="start">start</paper-button>
     </div>
 
+    <svg id="clickAnimation0" viewBox="0 0 24 24" height$={{clickAnimationRadius}} hidden>
+      <style type="text/css">
+      	.st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-miterlimit:10;}
+      </style>
+      <line class="st0" x1="15" y1="15" x2="19.4" y2="19.4"/>
+      <line class="st0" x1="16.2" y1="12" x2="22.5" y2="12"/>
+      <line class="st0" x1="15" y1="9" x2="19.4" y2="4.6"/>
+      <line class="st0" x1="12" y1="7.8" x2="12" y2="1.5"/>
+      <line class="st0" x1="9" y1="9" x2="4.6" y2="4.6"/>
+      <line class="st0" x1="7.8" y1="12" x2="1.5" y2="12"/>
+      <line class="st0" x1="9" y1="15" x2="4.6" y2="19.4"/>
+      <line class="st0" x1="12" y1="16.2" x2="12" y2="22.5"/>
+    </svg>
+
+    <svg id="clickAnimation1" viewBox="0 0 24 24" height$={{clickAnimationRadius}} hidden>
+      <style type="text/css">
+      	.st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-miterlimit:10;}
+      </style>
+      <line class="st0" x1="15" y1="15" x2="19.4" y2="19.4"/>
+      <line class="st0" x1="16.2" y1="12" x2="22.5" y2="12"/>
+      <line class="st0" x1="15" y1="9" x2="19.4" y2="4.6"/>
+      <line class="st0" x1="12" y1="7.8" x2="12" y2="1.5"/>
+      <line class="st0" x1="9" y1="9" x2="4.6" y2="4.6"/>
+      <line class="st0" x1="7.8" y1="12" x2="1.5" y2="12"/>
+      <line class="st0" x1="9" y1="15" x2="4.6" y2="19.4"/>
+      <line class="st0" x1="12" y1="16.2" x2="12" y2="22.5"/>
+    </svg>
 
     <paper-dialog id="score" with-backdrop>
       <h1>Score</h1>
       <p>Total Targets: {{totalTargets}}</p>
-      <p>Hits: {{totalTargets}}</p>
-      <p>Missclicks: {{totalTargets}}</p>
+      <p>Hits: {{hits}}</p>
+      <p>Missclicks: {{missClicks}}</p>
     </paper-dialog>
     <div id="container"></div>
   </template>
   <script>
+
+    let Noob = {
+      FREQUENCY: {max: 2000, min: 2000},
+      LIFESPAN: 2500,
+      CIRCLERADIUS: 25
+    }
+
+    let Average = {
+      FREQUENCY: {max: 1600, min: 750},
+      LIFESPAN: 1500,
+      CIRCLERADIUS: 14
+    }
+
+    let Pro = {
+      FREQUENCY: {max: 750, min: 500},
+      LIFESPAN: 1000,
+      CIRCLERADIUS: 5
+    }
 
     class GameMouse extends Polymer.Element {
       static get is() { return "game-mouse"; }
@@ -167,9 +268,14 @@
             notify: true
           },
           time: { type: Number, value: 60, notify: true },
-          frequency: { type: Number, value: 1000, notify: true },
-          lifeSpan: { type: Number, value: 1000, notify: true },
-          circleRadius: { type: Number, value: 8, notify: true },
+          frequency: {
+            type: Object,
+            value: Average.FREQUENCY,
+            notify: true
+          },
+          lifeSpan: { type: Number, value: Average.LIFESPAN, notify: true },
+          circleRadius: { type: Number, value: Average.CIRCLERADIUS, notify: true },
+          clickAnimationRadius: { computed: "_computeClickAnimationRadius(circleRadius)"},
           totalTargets: { type: Number, value: 0, notify: true },
           hits: { type: Number, value: 0, notify: true },
           missClicks: { type: Number, value: 0, notify: true },
@@ -180,21 +286,25 @@
         super.ready()
       }
 
+      _computeClickAnimationRadius(radius) {
+        return radius*2.25 + "px";
+      }
+
       onDifficultyClicked(event) {
         let difficulty = event.target.id;
         event.stopPropagation();
         if (difficulty == "noob") {
-          this.set("frequency", 2500);
-          this.set("lifeSpan", 2500);
-          this.set("circleRadius", 25);
+          this.set("frequency", Noob.FREQUENCY);
+          this.set("lifeSpan", Noob.LIFESPAN);
+          this.set("circleRadius", Noob.CIRCLERADIUS);
         } else if (difficulty == "average") {
-          this.set("frequency", 1000);
-          this.set("lifeSpan", 1500);
-          this.set("circleRadius", 14);
+          this.set("frequency", Average.FREQUENCY);
+          this.set("lifeSpan", Average.LIFESPAN);
+          this.set("circleRadius", Average.CIRCLERADIUS);
         } else if (difficulty == "pro") {
-          this.set("frequency", 300);
-          this.set("lifeSpan", 1000);
-          this.set("circleRadius", 5);
+          this.set("frequency", Pro.FREQUENCY);
+          this.set("lifeSpan", Pro.LIFESPAN);
+          this.set("circleRadius", Pro.CIRCLERADIUS);
         }
       }
 
@@ -208,10 +318,13 @@
 
         // Translate custom-el's props to vars
         let time           = this.time*1000; // s -> ms
-        let frequency      = this.frequency;
+        let frequency      = {};
+        frequency.max      = this.frequency.max;
+        frequency.min      = this.frequency.min;
         let lifeSpan       = this.lifeSpan;
         let circleRadius   = this.circleRadius;
 
+        let animationNum   = 0;
         let pointIncrement = 100; // Specifies the granularity/increments of coordinate axes
 
         let container = d3.select(this.$.container);
@@ -224,10 +337,10 @@
                     .attr("width", width)
                     .attr("height", height)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .on("click", () => {
+                    .on("mousedown", () => {
+                      d3.event.stopPropagation();
                       this.missClicks++;
                     });
-
 
         let xScale = d3.scaleLinear().range([0, width - circleRadius*2]) // - circleRadius*2 to avoid center of circle going outside of svg, cutting half of it out
                                      .domain([-pointIncrement, pointIncrement]);
@@ -243,16 +356,23 @@
               .attr("r", circleRadius)
               .attr("cx", xScale(x))
               .attr("cy", yScale(y))
-              .on("click", () => {
+              .on("mousedown", () => {
                 d3.event.stopPropagation();
                 target.remove();
                 this.hits++;
+                this.$[`clickAnimation${animationNum}`]
+                    .setAttribute("transform", "translate("
+                    + (xScale(x) - Number(this.clickAnimationRadius.replace("px", ""))/4) + ","
+                    + (yScale(y) - Number(this.clickAnimationRadius.replace("px", ""))/4) +")");
+                this.$[`clickAnimation${animationNum}`].removeAttribute("hidden");
+                animationNum = animationNum*-1 + 1;
+                this.$[`clickAnimation${animationNum}`].setAttribute("hidden", true);
               });
 
           setTimeout(() => {
             target.remove();
           }, lifeSpan);
-        }.bind(this), frequency);
+        }.bind(this), d3.randomUniform(frequency.min, frequency.max)());
 
         setTimeout(() => {
           clearInterval(interval);
