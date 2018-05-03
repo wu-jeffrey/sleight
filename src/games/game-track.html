@@ -14,7 +14,7 @@
 <link rel="import" href="../shared-styles.html">
 <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
 
-<dom-module id="game-twitch">
+<dom-module id="game-track">
   <template>
       <style include="shared-styles">
       :host {
@@ -142,7 +142,7 @@
     <div class="card game-settings" hidden$="{{gameInProgress}}">
       <div id="header">
         <iron-icon icon="hardware:mouse"></iron-icon>
-        <h1>Mouse Twitch</h1>
+        <h1>Mouse Track</h1>
       </div>
       <div class="difficulty-section">
         <div class="difficulty-button">
@@ -170,22 +170,13 @@
           </div>
         </div>
         <div class="input">
-          <span>Spawn speed</span>
+          <span>Movement Range</span>
           <div>
             <paper-range-slider min="500" max="5000" pin value-min="{{frequency.min}}" value-max="{{frequency.max}}"></paper-range-slider>
             <div class="text-input">
               <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.min}}"><div slot="suffix">ms</div></paper-input>
               <p>to</p>
               <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.max}}"><div slot="suffix">ms</div></paper-input>
-            </div>
-          </div>
-        </div>
-        <div class="input">
-          <span>Target lifespan</span>
-          <div>
-            <paper-slider min="500" max="5000" pin value="{{lifeSpan}}"></paper-slider>
-            <div class="text-input">
-              <paper-input min="500" max="5000" no-label-float type="number" value="{{lifeSpan}}"><div slot="suffix">ms</div></paper-input>
             </div>
           </div>
         </div>
@@ -240,26 +231,26 @@
   </template>
   <script>
 
-    let NoobTwitch = {
+    let NoobTrack = {
       FREQUENCY: {max: 2000, min: 2000},
       LIFESPAN: 2500,
       CIRCLERADIUS: 25
     }
 
-    let AverageTwitch = {
+    let AverageTrack = {
       FREQUENCY: {max: 1600, min: 750},
       LIFESPAN: 1500,
       CIRCLERADIUS: 14
     }
 
-    let ProTwitch = {
+    let ProTrack = {
       FREQUENCY: {max: 750, min: 500},
       LIFESPAN: 1000,
       CIRCLERADIUS: 5
     }
 
-    class GameTwitch extends Polymer.Element {
-      static get is() { return "game-twitch"; }
+    class GameTrack extends Polymer.Element {
+      static get is() { return "game-track"; }
       static get properties() {
         return {
           gameInProgress: {
@@ -270,11 +261,11 @@
           time: { type: Number, value: 60, notify: true },
           frequency: {
             type: Object,
-            value: AverageTwitch.FREQUENCY,
+            value: AverageTrack.FREQUENCY,
             notify: true
           },
-          lifeSpan: { type: Number, value: AverageTwitch.LIFESPAN, notify: true },
-          circleRadius: { type: Number, value: AverageTwitch.CIRCLERADIUS, notify: true },
+          lifeSpan: { type: Number, value: AverageTrack.LIFESPAN, notify: true },
+          circleRadius: { type: Number, value: AverageTrack.CIRCLERADIUS, notify: true },
           clickAnimationRadius: { computed: "_computeClickAnimationRadius(circleRadius)"},
           totalTargets: { type: Number, value: 0, notify: true },
           hits: { type: Number, value: 0, notify: true },
@@ -294,17 +285,17 @@
         let difficulty = event.target.id;
         event.stopPropagation();
         if (difficulty == "noob") {
-          this.set("frequency", NoobTwitch.FREQUENCY);
-          this.set("lifeSpan", NoobTwitch.LIFESPAN);
-          this.set("circleRadius", NoobTwitch.CIRCLERADIUS);
+          this.set("frequency", NoobTrack.FREQUENCY);
+          this.set("lifeSpan", NoobTrack.LIFESPAN);
+          this.set("circleRadius", NoobTrack.CIRCLERADIUS);
         } else if (difficulty == "average") {
-          this.set("frequency", AverageTwitch.FREQUENCY);
-          this.set("lifeSpan", AverageTwitch.LIFESPAN);
-          this.set("circleRadius", AverageTwitch.CIRCLERADIUS);
+          this.set("frequency", AverageTrack.FREQUENCY);
+          this.set("lifeSpan", AverageTrack.LIFESPAN);
+          this.set("circleRadius", AverageTrack.CIRCLERADIUS);
         } else if (difficulty == "pro") {
-          this.set("frequency", ProTwitch.FREQUENCY);
-          this.set("lifeSpan", ProTwitch.LIFESPAN);
-          this.set("circleRadius", ProTwitch.CIRCLERADIUS);
+          this.set("frequency", ProTrack.FREQUENCY);
+          this.set("lifeSpan", ProTrack.LIFESPAN);
+          this.set("circleRadius", ProTrack.CIRCLERADIUS);
         }
       }
 
@@ -382,6 +373,6 @@
         }, time);
       }
     }
-    window.customElements.define(GameTwitch.is, GameTwitch);
+    window.customElements.define(GameTrack.is, GameTrack);
   </script>
 </dom-module>
