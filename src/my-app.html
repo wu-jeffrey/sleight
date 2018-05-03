@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="my-icons.html">
 
-<link rel="lazy-import" href="page-mouse.html">
+<link rel="lazy-import" href="page-mouse-twitch.html">
 <link rel="lazy-import" href="page-keyboard.html">
 <link rel="lazy-import" href="page-404.html">
 
@@ -59,7 +59,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <app-header slot="header" condenses reveals effects="waterfall">
       <paper-tabs selected={{page}} attr-for-selected="name">
-        <paper-tab name="mouse">Mouse</paper-tab>
+        <paper-tab name="twitch">Twitch</paper-tab>
+        <paper-tab name="track">Track</paper-tab>
         <paper-tab name="keyboard">Keyboard</paper-tab>
       </paper-tabs>
     </app-header>
@@ -69,7 +70,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         attr-for-selected="name"
         fallback-selection="404"
         role="main">
-      <page-mouse name="mouse"></page-mouse>
+      <page-mouse-twitch name="twitch"></page-mouse-twitch>
+      <page-mouse-track name="track"></page-mouse-track>
       <page-keyboard name="keyboard"></page-keyboard>
       <page-404 name="404"></page-404>
     </iron-pages>
@@ -108,7 +110,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _routePageChanged(page) {
         // If no page was found in the route data, page will be an empty string.
         // Default to 'mouse' in that case.
-        this.page = page || 'mouse';
+        this.page = page || 'twitch';
       }
 
       _pageChanged(page) {

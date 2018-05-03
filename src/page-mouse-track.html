@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="./games/game-mouse.html">
 
-<dom-module id="page-mouse">
+<dom-module id="page-mouse-track">
   <template>
     <style include="shared-styles">
       :host {
@@ -27,9 +27,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
     class PageMouse extends Polymer.Element {
-      static get is() { return 'page-mouse'; }
+      static get is() { return 'page-mouse-track'; }
     }
 
-    window.customElements.define(PageMouse.is, PageMouse);
+    window.customElements.define(PageMouseTrack.is, PageMouseTrack);
   </script>
 </dom-module>
