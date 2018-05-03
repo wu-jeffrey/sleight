@@ -14,7 +14,7 @@
 <link rel="import" href="../shared-styles.html">
 <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
 
-<dom-module id="game-mouse">
+<dom-module id="game-twitch">
   <template>
       <style include="shared-styles">
       :host {
@@ -258,8 +258,8 @@
       CIRCLERADIUS: 5
     }
 
-    class GameMouse extends Polymer.Element {
-      static get is() { return "game-mouse"; }
+    class GameTwitch extends Polymer.Element {
+      static get is() { return "game-twitch"; }
       static get properties() {
         return {
           gameInProgress: {
@@ -382,6 +382,6 @@
         }, time);
       }
     }
-    window.customElements.define(GameMouse.is, GameMouse);
+    window.customElements.define(GameTwitch.is, GameTwitch);
   </script>
 </dom-module>
