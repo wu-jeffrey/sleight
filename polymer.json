@@ -3,7 +3,7 @@
   "shell": "src/my-app.html",
   "fragments": [
     "src/page-home.html",
-    "src/page-mouse-twitch.html",
+    "src/page-twitch.html",
     "src/page-keyboard.html",
     "src/page-404.html"
   ],
