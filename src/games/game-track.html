@@ -125,11 +125,6 @@
         height: 50%;
       }
 
-      @keyframes pop {
-        from { stroke-dashoffset: 0; }
-        to   { stroke-dashoffset: -7; }
-      }
-
       #clickAnimation0, #clickAnimation1 {
         position: absolute;
         stroke-dasharray: 8;
@@ -170,13 +165,11 @@
           </div>
         </div>
         <div class="input">
-          <span>Movement Range</span>
+          <span>Max Speed</span>
           <div>
-            <paper-range-slider min="500" max="5000" pin value-min="{{frequency.min}}" value-max="{{frequency.max}}"></paper-range-slider>
+            <paper-slider min="10" max="5000" pin value="{{time}}"></paper-slider>
             <div class="text-input">
-              <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.min}}"><div slot="suffix">ms</div></paper-input>
-              <p>to</p>
-              <paper-input min="500" max="5000" no-label-float type="number" value="{{frequency.max}}"><div slot="suffix">ms</div></paper-input>
+              <paper-input min="10" max="5000" no-label-float type="number" value="{{time}}"><div slot="suffix">ms</div></paper-input>
             </div>
           </div>
         </div>
@@ -193,34 +186,6 @@
       <paper-button class="button" on-click="start">start</paper-button>
     </div>
 
-    <svg id="clickAnimation0" viewBox="0 0 24 24" height$={{clickAnimationRadius}} hidden>
-      <style type="text/css">
-      	.st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-miterlimit:10;}
-      </style>
-      <line class="st0" x1="15" y1="15" x2="19.4" y2="19.4"/>
-      <line class="st0" x1="16.2" y1="12" x2="22.5" y2="12"/>
-      <line class="st0" x1="15" y1="9" x2="19.4" y2="4.6"/>
-      <line class="st0" x1="12" y1="7.8" x2="12" y2="1.5"/>
-      <line class="st0" x1="9" y1="9" x2="4.6" y2="4.6"/>
-      <line class="st0" x1="7.8" y1="12" x2="1.5" y2="12"/>
-      <line class="st0" x1="9" y1="15" x2="4.6" y2="19.4"/>
-      <line class="st0" x1="12" y1="16.2" x2="12" y2="22.5"/>
-    </svg>
-
-    <svg id="clickAnimation1" viewBox="0 0 24 24" height$={{clickAnimationRadius}} hidden>
-      <style type="text/css">
-      	.st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-miterlimit:10;}
-      </style>
-      <line class="st0" x1="15" y1="15" x2="19.4" y2="19.4"/>
-      <line class="st0" x1="16.2" y1="12" x2="22.5" y2="12"/>
-      <line class="st0" x1="15" y1="9" x2="19.4" y2="4.6"/>
-      <line class="st0" x1="12" y1="7.8" x2="12" y2="1.5"/>
-      <line class="st0" x1="9" y1="9" x2="4.6" y2="4.6"/>
-      <line class="st0" x1="7.8" y1="12" x2="1.5" y2="12"/>
-      <line class="st0" x1="9" y1="15" x2="4.6" y2="19.4"/>
-      <line class="st0" x1="12" y1="16.2" x2="12" y2="22.5"/>
-    </svg>
-
     <paper-dialog id="score" with-backdrop>
       <h1>Score</h1>
       <p>Total Targets: {{totalTargets}}</p>
@@ -232,20 +197,17 @@
   <script>
 
     let NoobTrack = {
-      FREQUENCY: {max: 2000, min: 2000},
-      LIFESPAN: 2500,
+      MAXSPEED: {max: 2000, min: 2000},
       CIRCLERADIUS: 25
     }
 
     let AverageTrack = {
-      FREQUENCY: {max: 1600, min: 750},
-      LIFESPAN: 1500,
+      MAXSPEED: {max: 1600, min: 750},
       CIRCLERADIUS: 14
     }
 
     let ProTrack = {
-      FREQUENCY: {max: 750, min: 500},
-      LIFESPAN: 1000,
+      MAXSPEED: {max: 750, min: 500},
       CIRCLERADIUS: 5
     }
 
@@ -259,17 +221,8 @@
             notify: true
           },
           time: { type: Number, value: 60, notify: true },
-          frequency: {
-            type: Object,
-            value: AverageTrack.FREQUENCY,
-            notify: true
-          },
-          lifeSpan: { type: Number, value: AverageTrack.LIFESPAN, notify: true },
+          maxSpeed: { type: Number, value: AverageTrack.MAXSPEED, notify: true },
           circleRadius: { type: Number, value: AverageTrack.CIRCLERADIUS, notify: true },
-          clickAnimationRadius: { computed: "_computeClickAnimationRadius(circleRadius)"},
-          totalTargets: { type: Number, value: 0, notify: true },
-          hits: { type: Number, value: 0, notify: true },
-          missClicks: { type: Number, value: 0, notify: true },
         }
       }
 
@@ -277,24 +230,17 @@
         super.ready()
       }
 
-      _computeClickAnimationRadius(radius) {
-        return radius*2.25 + "px";
-      }
-
       onDifficultyClicked(event) {
         let difficulty = event.target.id;
         event.stopPropagation();
         if (difficulty == "noob") {
-          this.set("frequency", NoobTrack.FREQUENCY);
-          this.set("lifeSpan", NoobTrack.LIFESPAN);
+          this.set("frequency", NoobTrack.MAXSPEED);
           this.set("circleRadius", NoobTrack.CIRCLERADIUS);
         } else if (difficulty == "average") {
-          this.set("frequency", AverageTrack.FREQUENCY);
-          this.set("lifeSpan", AverageTrack.LIFESPAN);
+          this.set("frequency", AverageTrack.MAXSPEED);
           this.set("circleRadius", AverageTrack.CIRCLERADIUS);
         } else if (difficulty == "pro") {
-          this.set("frequency", ProTrack.FREQUENCY);
-          this.set("lifeSpan", ProTrack.LIFESPAN);
+          this.set("frequency", ProTrack.MAXSPEED);
           this.set("circleRadius", ProTrack.CIRCLERADIUS);
         }
       }
@@ -309,9 +255,6 @@
 
         // Translate custom-el's props to vars
         let time           = this.time*1000; // s -> ms
-        let frequency      = {};
-        frequency.max      = this.frequency.max;
-        frequency.min      = this.frequency.min;
         let lifeSpan       = this.lifeSpan;
         let circleRadius   = this.circleRadius;
 
@@ -327,43 +270,37 @@
         let svg = container.append("svg")
                     .attr("width", width)
                     .attr("height", height)
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .on("mousedown", () => {
-                      d3.event.stopPropagation();
-                      this.missClicks++;
-                    });
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         let xScale = d3.scaleLinear().range([0, width - circleRadius*2]) // - circleRadius*2 to avoid center of circle going outside of svg, cutting half of it out
                                      .domain([-pointIncrement, pointIncrement]);
         let yScale = d3.scaleLinear().range([height - circleRadius*2, 0])
                                      .domain([-pointIncrement, pointIncrement]);
 
+        let target = svg.append("circle")
+            .attr("r", circleRadius)
+            .attr("cx", xScale(0))
+            .attr("cy", yScale(0));
+            // .on("mouseover", () => {
+            //
+            // })
+            // .on("mouseout", () => {
+            //
+            // })
+
+        let movementSpeed = d3.randomUniform(10, this.maxSpeed)();
         let interval = setInterval(function() {
-          this.totalTargets++;
-          let x = d3.randomUniform(-pointIncrement, pointIncrement)();
-          let y = d3.randomUniform(-pointIncrement, pointIncrement)();
+          let speed = d3.randomUniform(10, this.maxSpeed)();
+          let x     = d3.randomUniform(-pointIncrement, pointIncrement)();
+          let y     = d3.randomUniform(-pointIncrement, pointIncrement)();
 
-          let target = svg.append("circle")
-              .attr("r", circleRadius)
-              .attr("cx", xScale(x))
-              .attr("cy", yScale(y))
-              .on("mousedown", () => {
-                d3.event.stopPropagation();
-                target.remove();
-                this.hits++;
-                this.$[`clickAnimation${animationNum}`]
-                    .setAttribute("transform", "translate("
-                    + (xScale(x) - Number(this.clickAnimationRadius.replace("px", ""))/4) + ","
-                    + (yScale(y) - Number(this.clickAnimationRadius.replace("px", ""))/4) +")");
-                this.$[`clickAnimation${animationNum}`].removeAttribute("hidden");
-                animationNum = animationNum*-1 + 1;
-                this.$[`clickAnimation${animationNum}`].setAttribute("hidden", true);
-              });
+          target.transition()
+                .duration(speed)
+                .ease(d3.easeLinear)
+                .transform("translate(" + xScale(x) + "," + yScale(y) + ")");
 
-          setTimeout(() => {
-            target.remove();
-          }, lifeSpan);
-        }.bind(this), d3.randomUniform(frequency.min, frequency.max)());
+
+        }.bind(this), movementSpeed);
 
         setTimeout(() => {
           clearInterval(interval);
