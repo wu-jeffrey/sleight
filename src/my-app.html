@@ -60,23 +60,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <app-header slot="header" condenses reveals effects="waterfall">
       <paper-tabs selected={{page}} attr-for-selected="name">
-        <paper-tab name="twitch">Twitch</paper-tab>
-        <paper-tab name="track">Track</paper-tab>
-        <paper-tab name="keyboard">Keyboard</paper-tab>
+        <paper-tab name="twitch" disabled$="{{gameInProgress}}">Twitch</paper-tab>
+        <paper-tab name="track" disabled$="{{gameInProgress}}">Track</paper-tab>
+        <!-- <paper-tab name="keyboard">Keyboard</paper-tab> -->
       </paper-tabs>
     </app-header>
-
     <iron-pages
         selected="[[page]]"
         attr-for-selected="name"
         fallback-selection="404"
         role="main">
-      <page-twitch name="twitch"></page-twitch>
-      <page-track name="track"></page-track>
-      <page-keyboard name="keyboard"></page-keyboard>
+      <page-twitch name="twitch" game-in-progress="{{gameInProgress}}"></page-twitch>
+      <page-track name="track" game-in-progress="{{gameInProgress}}"></page-track>
+      <!-- <page-keyboard name="keyboard" game-in-progress={{gameInProgress}}></page-keyboard> -->
       <page-404 name="404"></page-404>
     </iron-pages>
-
   </template>
 
   <script>
@@ -86,9 +84,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     class MyApp extends Polymer.Element {
       static get is() { return 'my-app'; }
-
       static get properties() {
         return {
+          gameInProgress: {
+            type: Boolean,
+            notify: true
+          },
           page: {
             type: String,
             reflectToAttribute: true,

@@ -21,13 +21,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </style>
 
-    <game-track></game-track>
+    <game-track game-in-progress="{{gameInProgress}}"></game-track>
 
   </template>
 
   <script>
     class PageTrack extends Polymer.Element {
       static get is() { return 'page-track'; }
+      static get properties() {
+        return {
+          gameInProgress: {
+            type: Boolean,
+            notify: true
+          }
+        }
+      }
     }
 
     window.customElements.define(PageTrack.is, PageTrack);

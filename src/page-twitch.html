@@ -21,13 +21,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </style>
 
-    <game-twitch></game-twitch>
+    <game-twitch game-in-progress="{{gameInProgress}}"></game-twitch>
 
   </template>
 
   <script>
     class PageTwitch extends Polymer.Element {
       static get is() { return 'page-twitch'; }
+      static get properties() {
+        return {
+          gameInProgress: {
+            type: Boolean,
+            notify: true
+          }
+        }
+      }
     }
 
     window.customElements.define(PageTwitch.is, PageTwitch);

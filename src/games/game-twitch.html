@@ -121,8 +121,8 @@
       }
 
       #score {
-        width: 50%;
-        height: 50%;
+        min-width: 50%;
+        border-radius: 5px;
       }
 
       @keyframes pop {
@@ -230,12 +230,16 @@
       <line class="st0" x1="12" y1="16.2" x2="12" y2="22.5"/>
     </svg>
 
-    <paper-dialog id="score" with-backdrop>
+    <paper-dialog id="score" modal>
       <h1>Score</h1>
       <p>Total Targets: {{totalTargets}}</p>
       <p>Hits: {{hits}}</p>
       <p>Missclicks: {{missClicks}}</p>
+      <div class="buttons">
+        <paper-button dialog-dismiss autofocus>Close</paper-button>
+      </div>
     </paper-dialog>
+
     <div id="container"></div>
   </template>
   <script>
@@ -316,7 +320,7 @@
         this.hits          = 0;
         this.misses        = 0;
 
-        // Translate custom-el's props to vars
+        // Translate custom-el's properties  from settings to game variables
         let time           = this.time*1000; // s -> ms
         let frequency      = {};
         frequency.max      = this.frequency.max;
@@ -325,7 +329,7 @@
         let circleRadius   = this.circleRadius;
 
         let animationNum   = 0;   // Allows alternates between two pop animations
-        let pointIncrement = 100; // Specifies the granularity/increments of coordinate axes
+        let axisTickSize = 100; // Specifies the granularity/increments of coordinate axes
 
         let container = d3.select(this.$.container);
         let margin = { top: 10, left: 10, bottom: 10, right: 10 };
@@ -342,15 +346,15 @@
                       this.missClicks++;
                     });
 
-        let xScale = d3.scaleLinear().range([0, width - circleRadius*2]) // - circleRadius*2 to avoid center of circle going outside of svg, cutting half of it out
-                                     .domain([-pointIncrement, pointIncrement]);
-        let yScale = d3.scaleLinear().range([height - circleRadius*2, 0])
-                                     .domain([-pointIncrement, pointIncrement]);
+        let xScale = d3.scaleLinear().range([circleRadius, width - circleRadius]) // - from circleRadius to width- circlerad is to avoid center of circle going outside of svg, cutting half of it out
+                                     .domain([-axisTickSize, axisTickSize]);      // need to subtract from both sides so that the x,y coordinate grid of the potential locations is centered in the SVG
+        let yScale = d3.scaleLinear().range([height - circleRadius, circleRadius])
+                                     .domain([-axisTickSize, axisTickSize]);
 
         let interval = setInterval(function() {
           this.totalTargets++;
-          let x = d3.randomUniform(-pointIncrement, pointIncrement)();
-          let y = d3.randomUniform(-pointIncrement, pointIncrement)();
+          let x = d3.randomUniform(-axisTickSize, axisTickSize)();
+          let y = d3.randomUniform(-axisTickSize, axisTickSize)();
 
           let target = svg.append("circle")
               .attr("r", circleRadius)
