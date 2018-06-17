@@ -143,6 +143,7 @@
       <div id="header">
         <iron-icon icon="hardware:mouse"></iron-icon>
         <h1>Mouse Twitch</h1>
+        <span>Click on the targets</span>
       </div>
       <div class="difficulty-section">
         <div class="difficulty-button">
@@ -244,19 +245,19 @@
   </template>
   <script>
 
-    let NoobTwitch = {
+    const NoobTwitch = {
       FREQUENCY: {max: 2000, min: 2000},
       LIFESPAN: 2500,
       CIRCLERADIUS: 25
     }
 
-    let AverageTwitch = {
+    const AverageTwitch = {
       FREQUENCY: {max: 1600, min: 750},
       LIFESPAN: 1500,
       CIRCLERADIUS: 14
     }
 
-    let ProTwitch = {
+    const ProTwitch = {
       FREQUENCY: {max: 750, min: 500},
       LIFESPAN: 1000,
       CIRCLERADIUS: 5

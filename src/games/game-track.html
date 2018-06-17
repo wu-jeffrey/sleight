@@ -121,8 +121,8 @@
       }
 
       #score {
-        width: 50%;
-        height: 50%;
+        min-width: 50%;
+        border-radius: 5px;
       }
 
       #clickAnimation0, #clickAnimation1 {
@@ -131,13 +131,13 @@
         animation: pop 0.25s linear forwards;
       }
 
-
     </style>
 
     <div class="card game-settings" hidden$="{{gameInProgress}}">
       <div id="header">
         <iron-icon icon="hardware:mouse"></iron-icon>
         <h1>Mouse Track</h1>
+        <span>Keep your cursor on the target</span>
       </div>
       <div class="difficulty-section">
         <div class="difficulty-button">
@@ -164,21 +164,25 @@
             </div>
           </div>
         </div>
+
         <div class="input">
-          <span>Max Speed</span>
+          <span>Move Speed</span>
           <div>
-            <paper-slider min="10" max="5000" pin value="{{time}}"></paper-slider>
+            <paper-range-slider min="300" max="5000" pin value-min="{{moveSpeed.min}}" value-max="{{moveSpeed.max}}"></paper-range-slider>
             <div class="text-input">
-              <paper-input min="10" max="5000" no-label-float type="number" value="{{time}}"><div slot="suffix">ms</div></paper-input>
+              <paper-input min="300" max="5000" no-label-float type="number" value="{{moveSpeed.min}}"><div slot="suffix">ms</div></paper-input>
+              <p>to</p>
+              <paper-input min="300" max="5000" no-label-float type="number" value="{{moveSpeed.max}}"><div slot="suffix">ms</div></paper-input>
             </div>
           </div>
         </div>
+
         <div class="input">
           <span>Target radius</span>
           <div>
-            <paper-slider min="1" max="25" pin value="{{circleRadius}}"></paper-slider>
+            <paper-slider min="1" max="35" pin value="{{circleRadius}}"></paper-slider>
             <div class="text-input">
-              <paper-input min="1" max="25" no-label-float type="number" value="{{circleRadius}}"><div slot="suffix">px</div></paper-input>
+              <paper-input min="1" max="35" no-label-float type="number" value="{{circleRadius}}"><div slot="suffix">px</div></paper-input>
             </div>
           </div>
         </div>
@@ -186,29 +190,31 @@
       <paper-button class="button" on-click="start">start</paper-button>
     </div>
 
-    <paper-dialog id="score" with-backdrop>
+    <paper-dialog id="score" modal>
       <h1>Score</h1>
-      <p>Total Targets: {{totalTargets}}</p>
-      <p>Hits: {{hits}}</p>
-      <p>Missclicks: {{missClicks}}</p>
+      <p>Total Time: {{time}} s</p>
+      <p>Time on Target: {{timeOnTarget}} s</p>
+      <div class="buttons">
+        <paper-button dialog-dismiss autofocus>Close</paper-button>
+      </div>
     </paper-dialog>
     <div id="container"></div>
   </template>
   <script>
 
-    let NoobTrack = {
-      MAXSPEED: {max: 2000, min: 2000},
-      CIRCLERADIUS: 25
+    const NoobTrack = {
+      MOVESPEED: {max: 3500, min: 2000},
+      CIRCLERADIUS: 35
     }
 
-    let AverageTrack = {
-      MAXSPEED: {max: 1600, min: 750},
-      CIRCLERADIUS: 14
+    const AverageTrack = {
+      MOVESPEED: {max: 1200, min: 750},
+      CIRCLERADIUS: 20
     }
 
-    let ProTrack = {
-      MAXSPEED: {max: 750, min: 500},
-      CIRCLERADIUS: 5
+    const ProTrack = {
+      MOVESPEED: {max: 750, min: 500},
+      CIRCLERADIUS: 10
     }
 
     class GameTrack extends Polymer.Element {
@@ -221,8 +227,13 @@
             notify: true
           },
           time: { type: Number, value: 60, notify: true },
-          maxSpeed: { type: Number, value: AverageTrack.MAXSPEED, notify: true },
+          moveSpeed: {
+            type: Object,
+            value: AverageTrack.MOVESPEED,
+            notify: true
+          },
           circleRadius: { type: Number, value: AverageTrack.CIRCLERADIUS, notify: true },
+          timeOnTarget: { type: Number, value: 0, notify: true },
         }
       }
 
@@ -234,32 +245,26 @@
         let difficulty = event.target.id;
         event.stopPropagation();
         if (difficulty == "noob") {
-          this.set("frequency", NoobTrack.MAXSPEED);
+          this.set("moveSpeed", NoobTrack.MOVESPEED);
           this.set("circleRadius", NoobTrack.CIRCLERADIUS);
         } else if (difficulty == "average") {
-          this.set("frequency", AverageTrack.MAXSPEED);
+          this.set("moveSpeed", AverageTrack.MOVESPEED);
           this.set("circleRadius", AverageTrack.CIRCLERADIUS);
         } else if (difficulty == "pro") {
-          this.set("frequency", ProTrack.MAXSPEED);
+          this.set("moveSpeed", ProTrack.MOVESPEED);
           this.set("circleRadius", ProTrack.CIRCLERADIUS);
         }
       }
 
       start() {
         this.gameInProgress = true;
-
         // Reset Score
-        this.totalTargets  = 0;
-        this.hits          = 0;
-        this.misses        = 0;
+        this.timeOnTarget = 0;
 
-        // Translate custom-el's props to vars
         let time           = this.time*1000; // s -> ms
-        let lifeSpan       = this.lifeSpan;
         let circleRadius   = this.circleRadius;
 
-        let animationNum   = 0;
-        let pointIncrement = 100; // Specifies the granularity/increments of coordinate axes
+        let axisTickSize = 100; // Specifies the granularity/increments of coordinate axes
 
         let container = d3.select(this.$.container);
         let margin = { top: 10, left: 10, bottom: 10, right: 10 };
@@ -272,40 +277,43 @@
                     .attr("height", height)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        let xScale = d3.scaleLinear().range([0, width - circleRadius*2]) // - circleRadius*2 to avoid center of circle going outside of svg, cutting half of it out
-                                     .domain([-pointIncrement, pointIncrement]);
-        let yScale = d3.scaleLinear().range([height - circleRadius*2, 0])
-                                     .domain([-pointIncrement, pointIncrement]);
+        let xScale = d3.scaleLinear().range([circleRadius, width - circleRadius]) // - from circleRadius to width- circlerad is to avoid center of circle going outside of svg, cutting half of it out
+                                     .domain([-axisTickSize, axisTickSize]);      // need to subtract from both sides so that the x,y coordinate grid of the potential locations is centered in the SVG
+        let yScale = d3.scaleLinear().range([height - circleRadius, circleRadius])
+                                     .domain([-axisTickSize, axisTickSize]);
 
+        let tempTime;
         let target = svg.append("circle")
+            .attr("id", "target")
             .attr("r", circleRadius)
             .attr("cx", xScale(0))
-            .attr("cy", yScale(0));
-            // .on("mouseover", () => {
-            //
-            // })
-            // .on("mouseout", () => {
-            //
-            // })
+            .attr("cy", yScale(0))
+            .on("mouseover", () => {
+              target.attr("fill", "red");
+              tempTime = (new Date()).getTime();
+            })
+            .on("mouseout", () => {
+              target.attr("fill", "black");
+              this.timeOnTarget += (new Date()).getTime() - tempTime;
+            });
 
-        let movementSpeed = d3.randomUniform(10, this.maxSpeed)();
+        let movementSpeed = d3.randomUniform(this.moveSpeed.min, this.moveSpeed.max)();
         let interval = setInterval(function() {
-          let speed = d3.randomUniform(10, this.maxSpeed)();
-          let x     = d3.randomUniform(-pointIncrement, pointIncrement)();
-          let y     = d3.randomUniform(-pointIncrement, pointIncrement)();
+          let x = d3.randomUniform(-axisTickSize, axisTickSize)();
+          let y = d3.randomUniform(-axisTickSize, axisTickSize)();
 
           target.transition()
-                .duration(speed)
+                .duration(movementSpeed)
                 .ease(d3.easeLinear)
-                .transform("translate(" + xScale(x) + "," + yScale(y) + ")");
-
-
+                .attr("cx", xScale(x))
+                .attr("cy", yScale(y));
         }.bind(this), movementSpeed);
 
         setTimeout(() => {
           clearInterval(interval);
           container.select("svg").remove();
           this.gameInProgress = false;
+          this.timeOnTarget = this.timeOnTarget/1000;
           this.$.score.open();
         }, time);
       }
